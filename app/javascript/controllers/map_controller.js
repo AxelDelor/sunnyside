@@ -12,11 +12,11 @@ export default class extends Controller {
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(this.map);
 
-     // Charger les bars depuis OpenStreetMap
+    // Charger les bars depuis OpenStreetMap
     this.loadBarsFromOSM()
   }
 
-   async loadBarsFromOSM() {
+  async loadBarsFromOSM() {
     try {
       // Rectangle qui définit la zone de recherche
       const bounds = this.map.getBounds()
@@ -57,18 +57,25 @@ export default class extends Controller {
   addBarMarker(bar) {
     const name = bar.tags.name || "Bar sans nom"
     const lat = bar.lat
-    const lng = bar.lon
+    const lon = bar.lon
 
-    const marker = L.marker([lat, lng])
+    const marker = L.marker([lat, lon])
       .addTo(this.map)
       .bindPopup(`
         <div>
-          <b>${name}</b>
+          <b>${name}</b></br>
+          <button class="btn btn-primary"
+          data-action="click-map#addFavorite"
+          data-bar-name="${name}"
+          data-bar-lat="${lat}"
+          data-bar-lon="${lon}">
+          Ajouter
+          </button>
         </div>
       `)
   }
 
-  // addFavorite() {
-
-  // }
+  addFavorite() {
+    
+  }
 }
