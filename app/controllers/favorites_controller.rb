@@ -6,7 +6,7 @@ class FavoritesController < ApplicationController
   end
 
   def create
-    @user = User.current_or_guest
+    @user = current_user
     @favorite = Favorite.new(favorite_params)
     @favorite.save
   end
