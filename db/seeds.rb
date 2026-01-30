@@ -9,6 +9,6 @@
 #   end
 Favorite.destroy_all
 
-puts "Création de favoris"
-Favorite.create!(name:"Au bon godet", latitude: 50.64183549834662, longitude: 3.0844309160813608, sunny: false, user_id: 1)
-puts "#{Favorite.count} favoris créé"
+# puts "Création de favoris"
+# Favorite.create!(name:"Au bon godet", latitude: 50.64183549834662, longitude: 3.0844309160813608, sunny: false, user_id: 1)
+# puts "#{Favorite.count} favoris créé"

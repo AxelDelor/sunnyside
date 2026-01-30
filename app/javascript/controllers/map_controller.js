@@ -104,16 +104,30 @@ export default class extends Controller {
       // Conditions de bon fonctionnement
       if (response.ok) {
         const data = await response.json()
-        console.log("Youpi ${data}")
+        console.log("Youpi", data)
+        this.addFavoriteToList(data.favorite)
+
 
       } else {
         const error = await response.json()
         console.log("Erreur")
       }
 
-    } catch(error) {
+    } catch (error) {
       console.log("Catch")
       console.error("Erreur réseau:", error)
     }
+  }
+
+  addFavoriteToList(favorite) {
+    const favoritesList = document.getElementById('favorites-list')
+    const noFavoritesMessage = document.getElementById('no-favorites-message')
+
+    if (noFavoritesMessage) {
+      noFavoritesMessage.remove
+    }
+
+    const favoriteHTML = `<h4>${favorite.name}</h4>`
+    favoritesList.insertAdjacentHTML('beforeend', favoriteHTML)
   }
 }
