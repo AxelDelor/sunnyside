@@ -65,7 +65,7 @@ export default class extends Controller {
         <div>
           <b>${name}</b></br>
           <button class="btn btn-primary"
-          data-action="click-map#addFavorite"
+          data-action="click->map#addFavorite"
           data-bar-name="${name}"
           data-bar-lat="${lat}"
           data-bar-lon="${lon}">
@@ -75,7 +75,45 @@ export default class extends Controller {
       `)
   }
 
-  addFavorite() {
-    
+  async addFavorite(event) {
+    // Élément visé
+    const button = event.currentTarget
+
+    //Création de l'objet favoris
+    const favoriteData = {
+      name: button.dataset.barName,
+      latitude: parseFloat(button.dataset.barLat),
+      longitude: parseFloat(button.dataset.barLon)
+    }
+    console.log(favoriteData)
+    button.disabled = true
+
+    try {
+
+      // HTTP Request à l'url de la page, headers pour signifier envoi en JSON
+      // et sécurité CSRF pour les requêtes non GET
+      const response = await fetch("/favorites", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+          "X-CSRF-Token": document.querySelector('[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ favorite: favoriteData })
+      })
+
+      // Conditions de bon fonctionnement
+      if (response.ok) {
+        const data = await response.json()
+        console.log("Youpi ${data}")
+
+      } else {
+        const error = await response.json()
+        console.log("Erreur")
+      }
+
+    } catch(error) {
+      console.log("Catch")
+      console.error("Erreur réseau:", error)
+    }
   }
 }

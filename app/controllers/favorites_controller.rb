@@ -6,14 +6,15 @@ class FavoritesController < ApplicationController
   end
 
   def create
-    @user = current_user
     @favorite = Favorite.new(favorite_params)
+    @favorite.user = current_user
     @favorite.save
+    redirect_to favorites_path
   end
 
   private
 
   def favorite_params
-    params.require(:favorite).permit(:user_id, :name, :latitude, :longitude, :boolean)
+    params.require(:favorite).permit(:user_id, :name, :latitude, :longitude, :sunny)
   end
 end

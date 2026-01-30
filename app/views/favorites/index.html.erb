@@ -1,0 +1,17 @@
+<div class="container-fluid d-flex flex-row align-items-center justify-content-center" style="height: calc(100vh - 66px)">
+  <div>
+    <h2>Mes Favoris</h2>
+
+    <% @favorites.each do |favorite| %>
+      <h4><%= favorite.name %></h4>
+    <% end %>
+
+    <%= simple_form_for @favorite do |f| %>
+      <%= f.input :name, placeholder: "Nom du bar" %>
+      <%= f.submit "Ajouter un bar", class: "btn btn-primary" %>
+    <% end %>
+
+  </div>
+  <div id="map" data-controller="map" style="height: 500px; width: 800px;" >
+  </div>
+</div>
