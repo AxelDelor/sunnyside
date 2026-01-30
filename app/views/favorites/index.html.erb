@@ -2,9 +2,8 @@
   <div id="favorites-list">
     <h2>Mes Favoris</h2>
     <% if @favorites.any? %>
-      <% @favorites.each do |favorite| %>
-        <h4><%= favorite.name %></h4>
-      <% end %>
+      <%= turbo_frame_tag "favorite" %>
+      <%= render "favorites/list", favorite: @favorite %>
     <% else %>
       <p id="no-favorites-message">Vous n'avez pas encore de favoris.</p>
     <% end %>
