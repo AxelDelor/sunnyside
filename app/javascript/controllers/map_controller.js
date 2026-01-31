@@ -117,7 +117,7 @@ export default class extends Controller {
       console.error("Erreur réseau:", error)
     }
   }
-
+  // remplacement des favoris en temps réel
   addFavoriteToList(favorite) {
     const ul = document.querySelector('#favorites-list ul.list-group')
     const noFavoritesMessage = document.getElementById('no-favorites-message')
