@@ -1,13 +1,19 @@
-<div class="container-fluid d-flex flex-row align-items-center justify-content-center" style="height: calc(100vh - 66px)">
-  <div id="favorites-list">
-    <h2>Mes Favoris</h2>
-    <% if @favorites.any? %>
-      <%= turbo_frame_tag "favorite" %>
-      <%= render "favorites/list", favorite: @favorite %>
-    <% else %>
-      <p id="no-favorites-message">Vous n'avez pas encore de favoris.</p>
-    <% end %>
+<div class="container-fluid d-flex flex-row align-items-center justify-content-center gap-2" style="height: calc(100vh - 66px)">
+  <div>
+    <div id="favorites-list" class="card" style="width: 25rem; height: 800px; overflow-y: auto;">
+      <div class="card-header fw-bold">Mes Favoris</div>
+      <ul class="list-group list-group-flush">
+        <% if @favorites.any? %>
+          <% @favorites.each do |favorite| %>
+            <li class="list-group-item"><%= favorite.name %> <%= favorite.sunny ? "Yes" : "No"%></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item" id="no-favorites-message">Vous n'avez pas encore de favoris.</li>
+        </ul>
+      <% end %>
+    </div>
   </div>
-  <div id="map" data-controller="map" style="height: 500px; width: 800px;" >
+  <div id="map" class="card" data-controller="map" style="height: 800px; width: 800px;" >
   </div>
-</div>

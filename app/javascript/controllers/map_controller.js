@@ -3,7 +3,6 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="map"
 export default class extends Controller {
   connect() {
-    console.log("coucou")
     this.map = L.map('map').setView([50.6292, 3.0573], 13)
 
     // Layers
@@ -120,14 +119,15 @@ export default class extends Controller {
   }
 
   addFavoriteToList(favorite) {
-    const favoritesList = document.getElementById('favorites-list')
+    const ul = document.querySelector('#favorites-list ul.list-group')
     const noFavoritesMessage = document.getElementById('no-favorites-message')
 
     if (noFavoritesMessage) {
-      noFavoritesMessage.remove
+      noFavoritesMessage.remove()
     }
 
-    const favoriteHTML = `<h4>${favorite.name}</h4>`
-    favoritesList.insertAdjacentHTML('beforeend', favoriteHTML)
+    const favoriteHTML = `<li class="list-group-item">${favorite.name}</li>`
+    ul.insertAdjacentHTML('beforeend', favoriteHTML)
+
   }
 }
