@@ -126,7 +126,15 @@ export default class extends Controller {
       noFavoritesMessage.remove()
     }
 
-    const favoriteHTML = `<li class="list-group-item">${favorite.name}</li>`
+    const favoriteHTML =`
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <span>
+        ${favorite.name}
+      </span>
+      <span class="badge ${favorite.sunny ? 'bg-success' : 'bg-secondary'}">
+        ${favorite.sunny ? "Yes" : "No"}
+      </span>
+    </li>`
     ul.insertAdjacentHTML('beforeend', favoriteHTML)
 
   }
