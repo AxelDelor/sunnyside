@@ -3,7 +3,6 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="map"
 export default class extends Controller {
   connect() {
-    console.log("coucou")
     this.map = L.map('map').setView([50.6292, 3.0573], 13)
 
     // Layers
@@ -65,7 +64,7 @@ export default class extends Controller {
         <div>
           <b>${name}</b></br>
           <button class="btn btn-primary"
-          data-action="click-map#addFavorite"
+          data-action="click->map#addFavorite"
           data-bar-name="${name}"
           data-bar-lat="${lat}"
           data-bar-lon="${lon}">
@@ -75,7 +74,68 @@ export default class extends Controller {
       `)
   }
 
-  addFavorite() {
-    
+  async addFavorite(event) {
+    // Élément visé
+    const button = event.currentTarget
+
+    //Création de l'objet favoris
+    const favoriteData = {
+      name: button.dataset.barName,
+      latitude: parseFloat(button.dataset.barLat),
+      longitude: parseFloat(button.dataset.barLon)
+    }
+    console.log(favoriteData)
+    button.disabled = true
+
+    try {
+
+      // HTTP Request à l'url de la page, headers pour signifier envoi en JSON
+      // et sécurité CSRF pour les requêtes non GET
+      const response = await fetch("/favorites", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+          "X-CSRF-Token": document.querySelector('[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ favorite: favoriteData })
+      })
+
+      // Conditions de bon fonctionnement
+      if (response.ok) {
+        const data = await response.json()
+        console.log("Youpi", data)
+        this.addFavoriteToList(data.favorite)
+
+
+      } else {
+        const error = await response.json()
+        console.log("Erreur")
+      }
+
+    } catch (error) {
+      console.log("Catch")
+      console.error("Erreur réseau:", error)
+    }
+  }
+  // remplacement des favoris en temps réel
+  addFavoriteToList(favorite) {
+    const ul = document.querySelector('#favorites-list ul.list-group')
+    const noFavoritesMessage = document.getElementById('no-favorites-message')
+
+    if (noFavoritesMessage) {
+      noFavoritesMessage.remove()
+    }
+
+    const favoriteHTML =`
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <span>
+        ${favorite.name}
+      </span>
+      <span class="badge ${favorite.sunny ? 'bg-success' : 'bg-secondary'}">
+        ${favorite.sunny ? "Yes" : "No"}
+      </span>
+    </li>`
+    ul.insertAdjacentHTML('beforeend', favoriteHTML)
+
   }
 }

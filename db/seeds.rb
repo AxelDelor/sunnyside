@@ -7,3 +7,8 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+Favorite.destroy_all
+
+# puts "Création de favoris"
+# Favorite.create!(name:"Au bon godet", latitude: 50.64183549834662, longitude: 3.0844309160813608, sunny: false, user_id: 1)
+# puts "#{Favorite.count} favoris créé"
