@@ -11,7 +11,11 @@ class FavoritesController < ApplicationController
     if @favorite.save
       render json: { success: true, favorite: @favorite }, status: :created
     else
-      render json: { success: false, message: @favorite.errors.full_messages.join(", ") }, status: :unprocessable_entity
+      message = @favorite.errors.full_messages
+        .join(", ")
+        .gsub(/^Name /, "")
+
+      render json: { success: false, message: message }, status: :unprocessable_entity
     end
   end
 

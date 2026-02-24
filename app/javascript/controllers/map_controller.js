@@ -100,21 +100,26 @@ export default class extends Controller {
         body: JSON.stringify({ favorite: favoriteData })
       })
 
+      const data = await response.json()
+
       // Conditions de bon fonctionnement
-      if (response.ok) {
-        const data = await response.json()
-        console.log("Youpi", data)
+      if (data.success) {
+        button.textContent = "✅ Ajouté !"
+        button.classList.remove('btn-primary')
+        button.classList.add('btn-success')
+
         this.addFavoriteToList(data.favorite)
 
-
       } else {
-        const error = await response.json()
-        console.log("Erreur")
+        console.log("Erreur:", data.message)
+        button.textContent = "❌ Déjà ajouté"
+        button.classList.remove('btn-primary')
+        button.classList.add('btn-warning')
       }
 
     } catch (error) {
-      console.log("Catch")
       console.error("Erreur réseau:", error)
+      button.textContent = "❌ Erreur"
     }
   }
   // remplacement des favoris en temps réel
@@ -126,7 +131,7 @@ export default class extends Controller {
       noFavoritesMessage.remove()
     }
 
-    const favoriteHTML =`
+    const favoriteHTML = `
     <li class="list-group-item d-flex justify-content-between align-items-center">
       <span>
         ${favorite.name}
