@@ -30,6 +30,8 @@ export default class extends Controller {
         (
           node["amenity"="bar"](${south},${west},${north},${east});
           node["amenity"="pub"](${south},${west},${north},${east});
+          node["amenity"="cafe"](${south},${west},${north},${east});
+          node["amenity"="restaurant"](${south},${west},${north},${east});
         );
         out body;
       `
