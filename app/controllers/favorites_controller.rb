@@ -19,6 +19,11 @@ class FavoritesController < ApplicationController
     end
   end
 
+  def destroy
+    @favorite =
+    @favorite.destroy
+  end
+
   private
 
   def favorite_params
