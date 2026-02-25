@@ -63,7 +63,7 @@ export default class extends Controller {
     const marker = L.marker([lat, lon])
       .addTo(this.map)
       .bindPopup(`
-        <div>
+        <div class="popup">
           <b>${name}</b></br>
           <button class="btn btn-primary"
           data-action="click->map#addFavorite"
@@ -106,22 +106,22 @@ export default class extends Controller {
 
       // Conditions de bon fonctionnement
       if (data.success) {
-        button.textContent = "✅ Ajouté !"
-        button.classList.remove('btn-primary')
-        button.classList.add('btn-success')
+        button.textContent = "Ajouté !"
+        button.classList.remove("btn-primary")
+        button.classList.add("btn-success")
 
         this.addFavoriteToList(data.favorite)
 
       } else {
         console.log("Erreur:", data.message)
-        button.textContent = "❌ Déjà ajouté"
-        button.classList.remove('btn-primary')
-        button.classList.add('btn-warning')
+        button.textContent = "Déjà ajouté"
+        button.classList.remove("btn-primary")
+        button.classList.add("btn-warning")
       }
 
     } catch (error) {
       console.error("Erreur réseau:", error)
-      button.textContent = "❌ Erreur"
+      button.textContent = "Erreur"
     }
   }
   // remplacement des favoris en temps réel
