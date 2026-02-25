@@ -139,7 +139,7 @@ export default class extends Controller {
         ${favorite.name}
       </span>
       <span class="badge ${favorite.sunny ? 'bg-success' : 'bg-secondary'}">
-        ${favorite.sunny ? "Yes" : "No"}
+        ${favorite.sunny ? "Soleil" : "Ombre"}
       </span>
     </li>`
     ul.insertAdjacentHTML('beforeend', favoriteHTML)
