@@ -1,11 +1,10 @@
 class FavoritesController < ApplicationController
   def index
     @favorites = current_user.favorites
+    @all_bars = Bar.all
   end
 
   def create
-    # @favorite = Favorite.new(favorite_params)
-    # @favorite.user = current_user
     @favorite = current_user.favorites.build(favorite_params)
 
     if @favorite.save
@@ -20,8 +19,9 @@ class FavoritesController < ApplicationController
   end
 
   def destroy
-    @favorite =
+    @favorite = current_user.favorites.find(params[:id])
     @favorite.destroy
+    redirect_to favorites_path, notice: "Favori supprimé !"
   end
 
   private

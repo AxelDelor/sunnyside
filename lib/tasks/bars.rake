@@ -1,6 +1,8 @@
-namespace :bar do
+namespace :bars do
   desc "Importer tous les bars grâce à l'API Overpass"
   task import: :environment do
+    require 'net/http'
+    require 'json'
     puts "Importation des bars"
 
     # Zone de Lille métropole
@@ -11,12 +13,12 @@ namespace :bar do
 
     # Requête Overpass pour récupérer les bars
     query = <<~QUERY
-      [out:json][timeout:60];
+      [out:json][timeout:60][bbox:#{south},#{west},#{north},#{east}];
       (
-        node["amenity"="bar"](${south},${west},${north},${east});
-        node["amenity"="pub"](${south},${west},${north},${east});
-        node["amenity"="cafe"](${south},${west},${north},${east});
-        node["amenity"="restaurant"](${south},${west},${north},${east});
+        node["amenity"="bar"];
+        node["amenity"="pub"];
+        node["amenity"="cafe"];
+        node["amenity"="restaurant"];
       );
       out body;
     QUERY
@@ -28,7 +30,7 @@ namespace :bar do
     bars_count = 0
     duplicates_count = 0
 
-    data["elements"].each do |elements|
+    data["elements"].each do |element|
       bar_name = element.dig("tags", "name") || "Nom inconnu"
       bar_lat = element.dig("lat")
       bar_lon = element.dig("lon")

@@ -2,8 +2,14 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="map"
 export default class extends Controller {
+  static values = { bars: Array }
+
   connect() {
+    console.log(`${this.barsValue.length} bars chargés depuis le HTML !`)
+
     this.map = L.map('map').setView([50.6292, 3.0573], 13)
+    this.markers = []
+    this.allBars = this.barsValue
 
     // Layers
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -11,56 +17,18 @@ export default class extends Controller {
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(this.map);
 
-    // Charger les bars depuis OpenStreetMap
-    this.loadBarsFromOSM()
+    this.allBars.forEach(bar => {
+      const marker = this.addBarMarker(bar)
+      this.markers.push(marker)
+    })
+
   }
 
-  async loadBarsFromOSM() {
-    try {
-      // Rectangle qui définit la zone de recherche
-      const bounds = this.map.getBounds()
-      const south = bounds.getSouth()
-      const west = bounds.getWest()
-      const north = bounds.getNorth()
-      const east = bounds.getEast()
-
-      // Requête Overpass pour récupérer les bars
-      const query = `
-        [out:json][timeout:25];
-        (
-          node["amenity"="bar"](${south},${west},${north},${east});
-          node["amenity"="pub"](${south},${west},${north},${east});
-          node["amenity"="cafe"](${south},${west},${north},${east});
-          node["amenity"="restaurant"](${south},${west},${north},${east});
-        );
-        out body;
-      `
-
-      const response = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST',
-        body: query
-      })
-
-      const data = await response.json()
-
-      console.log("Bars trouvés:", data.elements)
-
-      // Ajouter les markers pour chaque bar
-      data.elements.forEach(bar => {
-        this.addBarMarker(bar)
-      })
-
-    } catch (error) {
-      console.error("Erreur lors du chargement des bars:", error)
-    }
-  }
 
   addBarMarker(bar) {
-    const name = bar.tags.name || "Bar sans nom"
-    const lat = bar.lat
-    const lon = bar.lon
+    const name = bar.name || "Bar sans nom"
 
-    const marker = L.marker([lat, lon])
+    const marker = L.marker([bar.latitude, bar.longitude])
       .addTo(this.map)
       .bindPopup(`
         <div class="popup">
@@ -68,12 +36,13 @@ export default class extends Controller {
           <button class="btn btn-primary"
           data-action="click->map#addFavorite"
           data-bar-name="${name}"
-          data-bar-lat="${lat}"
-          data-bar-lon="${lon}">
+          data-bar-lat="${bar.latitude}"
+          data-bar-lon="${bar.longitude}">
           Ajouter
           </button>
         </div>
       `)
+    return marker
   }
 
   async addFavorite(event) {
@@ -135,14 +104,28 @@ export default class extends Controller {
 
     const favoriteHTML = `
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <span>
-        ${favorite.name}
-      </span>
-      <span class="badge ${favorite.sunny ? 'bg-success' : 'bg-secondary'}">
-        ${favorite.sunny ? "Soleil" : "Ombre"}
-      </span>
+      <div class="d-flex align-items-center justify-content-center gap-2">
+        <span>${favorite.name}</span>
+        <span class="badge ${favorite.sunny ? 'bg-success' : 'bg-secondary'}">${favorite.sunny ? "Soleil" : "Ombre"}
+        </span>
+      </div>
+      <a href="/favorites/${favorite.id}"
+        data-turbo-method="delete"
+        data-turbo-confirm="Voulez-vous vraiment supprimer ce favoris ?"
+        class="btn btn-warning text-white rounded-4 fw-bold">
+        X
+      </a>
     </li>`
     ul.insertAdjacentHTML('beforeend', favoriteHTML)
 
+
+
+
+  }
+
+  disconnect() {
+    if (this.map) {
+      this.map.remove()
+    }
   }
 }
