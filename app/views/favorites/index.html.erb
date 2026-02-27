@@ -1,34 +1,23 @@
 <div class="container-fluid">
   <div class="row g-2 page-content p-3">
-
     <div class="col-12 col-lg-8 order-1 order-lg-2">
-      <div id="map" class="card map-card" data-controller="map" data-map-bars-value="<%= @all_bars.to_json(only: [:id, :name, :latitude, :longitude, :address]) %>"></div>
+      <div id="map"
+      class="card map-card"
+      data-controller="map"
+      data-map-bars-value="<%= @all_bars.to_json(only: [:id, :name, :latitude, :longitude, :address]) %>">
+      </div>
     </div>
-
     <div class="col-12 col-lg-4 order-2 order-lg-1">
-      <div id="favorites-list" class="card favorites-card" style="overflow-y: auto;">
+      <div class="card favorites-card" style="overflow-y: auto;">
         <div class="card-header fw-bold">Mes Favoris</div>
-
-        <ul class="list-group list-group-flush">
+        <ul id="favorites_list" class="list-group list-group-flush">
           <% if @favorites.any? %>
-            <% @favorites.each do |favorite| %>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center justify-content-center gap-2">
-                  <span><%= favorite.name %></span>
-                  <span class="badge <%= favorite.sunny ? 'bg-success' : 'bg-secondary' %>"><%= favorite.sunny ? "Soleil!" : "Ombre" %></span>
-                </div>
-                <%= link_to "X",
-                favorite_path(favorite),
-                data: {turbo_method: :delete, turbo_confirm: "Voulez-vous vraiment supprimer ce favoris ?"},
-                class: "btn btn-warning text-white rounded-4 fw-bold" %>
-              </li>
-            <% end %>
+            <%= render @favorites %>
           <% else %>
             <li class="list-group-item" id="no-favorites-message">Vous n'avez pas encore de favoris.</li>
           <% end %>
         </ul>
       </div>
     </div>
-
   </div>
 </div>
