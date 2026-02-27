@@ -1,0 +1,13 @@
+<li id="favorite_<%= favorite.id %>"
+    class="list-group-item d-flex justify-content-between align-items-center">
+  <div class="d-flex align-items-center justify-content-center gap-2">
+    <span><%= favorite.name %></span>
+    <span class="badge <%= favorite.sunny ? 'bg-success' : 'bg-secondary' %>">
+      <%= favorite.sunny ? "Soleil!" : "Ombre" %>
+    </span>
+  </div>
+  <%= link_to "X",
+        favorite_path(favorite),
+        data: { turbo_method: :delete, turbo_confirm: "Voulez-vous vraiment supprimer ce favoris ?" },
+        class: "btn btn-warning text-white rounded-4 fw-bold" %>
+</li>

@@ -1,27 +1,33 @@
 class FavoritesController < ApplicationController
   def index
     @favorites = current_user.favorites
+    @all_bars = Bar.all
   end
 
   def create
-    # @favorite = Favorite.new(favorite_params)
-    # @favorite.user = current_user
     @favorite = current_user.favorites.build(favorite_params)
 
     if @favorite.save
-      render json: { success: true, favorite: @favorite }, status: :created
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to favorites_path }
+      end
     else
-      message = @favorite.errors.full_messages
-        .join(", ")
-        .gsub(/^Name /, "")
-
-      render json: { success: false, message: message }, status: :unprocessable_entity
+      respond_to do |format|
+        format.turbo_stream { head :unprocessable_entity }
+        format.html { redirect_to favorites_path, alert: "Erreur lors de l'ajout du favori" }
+      end
     end
   end
 
   def destroy
-    @favorite =
+    @favorite = current_user.favorites.find(params[:id])
     @favorite.destroy
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to favorites_path, notice: "Favori supprimé !" }
+    end
   end
 
   private

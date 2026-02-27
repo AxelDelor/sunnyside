@@ -1,0 +1,5 @@
+<%= turbo_stream.remove "no-favorites-message" %>
+
+<%= turbo_stream.append "favorites_list" do %>
+  <%= render @favorite %>
+<% end %>

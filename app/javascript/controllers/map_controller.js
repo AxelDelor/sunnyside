@@ -2,8 +2,14 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="map"
 export default class extends Controller {
+  static values = { bars: Array }
+  static targets = ["submitButton"]
+
   connect() {
+    console.log(`${this.barsValue.length} bars chargés depuis le HTML !`)
+
     this.map = L.map('map').setView([50.6292, 3.0573], 13)
+    this.markers = []
 
     // Layers
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -11,138 +17,86 @@ export default class extends Controller {
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(this.map);
 
-    // Charger les bars depuis OpenStreetMap
-    this.loadBarsFromOSM()
+    this.barsValue.forEach(bar => {
+      const marker = this.addBarMarker(bar)
+      this.markers.push(marker)
+    })
+
   }
 
-  async loadBarsFromOSM() {
-    try {
-      // Rectangle qui définit la zone de recherche
-      const bounds = this.map.getBounds()
-      const south = bounds.getSouth()
-      const west = bounds.getWest()
-      const north = bounds.getNorth()
-      const east = bounds.getEast()
-
-      // Requête Overpass pour récupérer les bars
-      const query = `
-        [out:json][timeout:25];
-        (
-          node["amenity"="bar"](${south},${west},${north},${east});
-          node["amenity"="pub"](${south},${west},${north},${east});
-          node["amenity"="cafe"](${south},${west},${north},${east});
-          node["amenity"="restaurant"](${south},${west},${north},${east});
-        );
-        out body;
-      `
-
-      const response = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST',
-        body: query
-      })
-
-      const data = await response.json()
-
-      console.log("Bars trouvés:", data.elements)
-
-      // Ajouter les markers pour chaque bar
-      data.elements.forEach(bar => {
-        this.addBarMarker(bar)
-      })
-
-    } catch (error) {
-      console.error("Erreur lors du chargement des bars:", error)
-    }
-  }
 
   addBarMarker(bar) {
-    const name = bar.tags.name || "Bar sans nom"
-    const lat = bar.lat
-    const lon = bar.lon
+    const name = bar.name || "Bar sans nom"
+    const csrfToken = document.querySelector('[name="csrf-token"]').content
 
-    const marker = L.marker([lat, lon])
+      const svgIcon = L.divIcon({
+    className: 'custom-svg-marker',
+    html: `
+      <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#ffc107"
+              stroke="#fff"
+              stroke-width="2"
+              d="M12.5 0C5.6 0 0 5.6 0 12.5c0 8.4 12.5 28.5 12.5 28.5S25 20.9 25 12.5C25 5.6 19.4 0 12.5 0z"/>
+        <circle cx="12.5" cy="12.5" r="6" fill="#fff"/>
+      </svg>
+    `,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -41]
+  })
+
+    const marker = L.marker([bar.latitude, bar.longitude], { icon: svgIcon})
       .addTo(this.map)
       .bindPopup(`
         <div class="popup">
           <b>${name}</b></br>
-          <button class="btn btn-primary"
-          data-action="click->map#addFavorite"
-          data-bar-name="${name}"
-          data-bar-lat="${lat}"
-          data-bar-lon="${lon}">
-          Ajouter
-          </button>
+          <form action="/favorites"
+          method="post"
+          data-turbo="true"
+          data-action="
+          turbo:submit-start->map#disableButton
+          turbo:submit-end->map#handleSubmit
+          ">
+            <input type="hidden" name="authenticity_token" value="${csrfToken}">
+            <input type="hidden" name="favorite[name]" value="${name}">
+            <input type="hidden" name="favorite[latitude]" value="${bar.latitude}">
+            <input type="hidden" name="favorite[longitude]" value="${bar.longitude}">
+            <input type="hidden" name="favorite[sunny]" value="false">
+            <button type="submit" class="btn btn-primary">
+              Ajouter
+            </button>
+          </form>
         </div>
       `)
+
+    return marker
   }
 
-  async addFavorite(event) {
-    // Élément visé
-    const button = event.currentTarget
-
-    //Création de l'objet favoris
-    const favoriteData = {
-      name: button.dataset.barName,
-      latitude: parseFloat(button.dataset.barLat),
-      longitude: parseFloat(button.dataset.barLon)
-    }
-    console.log(favoriteData)
+    disableButton(event) {
+    const button = event.target.querySelector('button[type="submit"]')
     button.disabled = true
-
-    try {
-
-      // HTTP Request à l'url de la page, headers pour signifier envoi en JSON
-      // et sécurité CSRF pour les requêtes non GET
-      const response = await fetch("/favorites", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-          "X-CSRF-Token": document.querySelector('[name="csrf-token"]').content
-        },
-        body: JSON.stringify({ favorite: favoriteData })
-      })
-
-      const data = await response.json()
-
-      // Conditions de bon fonctionnement
-      if (data.success) {
-        button.textContent = "Ajouté !"
-        button.classList.remove("btn-primary")
-        button.classList.add("btn-success")
-
-        this.addFavoriteToList(data.favorite)
-
-      } else {
-        console.log("Erreur:", data.message)
-        button.textContent = "Déjà ajouté"
-        button.classList.remove("btn-primary")
-        button.classList.add("btn-warning")
-      }
-
-    } catch (error) {
-      console.error("Erreur réseau:", error)
-      button.textContent = "Erreur"
-    }
+    button.textContent = "Ajout..."
   }
-  // remplacement des favoris en temps réel
-  addFavoriteToList(favorite) {
-    const ul = document.querySelector('#favorites-list ul.list-group')
-    const noFavoritesMessage = document.getElementById('no-favorites-message')
 
-    if (noFavoritesMessage) {
-      noFavoritesMessage.remove()
+  handleSubmit(event) {
+  const button = event.target.querySelector('button[type="submit"]')
+
+  if (event.detail.success) {
+    button.textContent = "Ajouté !"
+    button.classList.remove("btn-primary")
+    button.classList.add("btn-success")
+
+  } else {
+    button.textContent = "Déjà ajouté"
+    button.classList.remove("btn-primary")
+    button.classList.add("btn-warning")
+    button.disabled = false
+  }
+}
+
+  disconnect() {
+    if (this.map) {
+      this.map.remove()
     }
-
-    const favoriteHTML = `
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-      <span>
-        ${favorite.name}
-      </span>
-      <span class="badge ${favorite.sunny ? 'bg-success' : 'bg-secondary'}">
-        ${favorite.sunny ? "Soleil" : "Ombre"}
-      </span>
-    </li>`
-    ul.insertAdjacentHTML('beforeend', favoriteHTML)
-
   }
 }
