@@ -1,10 +1,8 @@
 <div class="container-fluid">
   <div class="row g-2 page-content p-3">
-
     <div class="col-12 col-lg-8 order-1 order-lg-2">
       <div id="map" class="card map-card" data-controller="map"></div>
     </div>
-
     <div class="col-12 col-lg-4 order-2 order-lg-1">
       <div id="favorites-list" class="card favorites-card" style="overflow-y: auto;">
         <div class="card-header fw-bold">Mes Favoris</div>
@@ -12,8 +10,11 @@
           <% if @favorites.any? %>
             <% @favorites.each do |favorite| %>
               <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span><%= favorite.name %></span>
-                <span class="badge <%= favorite.sunny ? 'bg-success' : 'bg-secondary' %>"><%= favorite.sunny ? "Yes" : "No" %></span>
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                  <span><%= favorite.name %></span>
+                  <span class="badge <%= favorite.sunny ? 'bg-success' : 'bg-secondary' %>"><%= favorite.sunny ? "Soleil!" : "Ombre" %></span>
+                </div>
+                <span class="btn btn-warning text-white rounded-4 fw-bold">X</span>
               </li>
             <% end %>
           <% else %>
