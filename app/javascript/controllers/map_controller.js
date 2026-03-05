@@ -29,9 +29,9 @@ export default class extends Controller {
     const name = bar.name || "Bar sans nom"
     const csrfToken = document.querySelector('[name="csrf-token"]').content
 
-      const svgIcon = L.divIcon({
-    className: 'custom-svg-marker',
-    html: `
+    const svgIcon = L.divIcon({
+      className: 'custom-svg-marker',
+      html: `
       <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
         <path fill="#ffc107"
               stroke="#fff"
@@ -40,12 +40,12 @@ export default class extends Controller {
         <circle cx="12.5" cy="12.5" r="6" fill="#fff"/>
       </svg>
     `,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [0, -41]
-  })
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [0, -41]
+    })
 
-    const marker = L.marker([bar.latitude, bar.longitude], { icon: svgIcon})
+    const marker = L.marker([bar.latitude, bar.longitude], { icon: svgIcon })
       .addTo(this.map)
       .bindPopup(`
         <div class="popup">
@@ -72,27 +72,27 @@ export default class extends Controller {
     return marker
   }
 
-    disableButton(event) {
+  disableButton(event) {
     const button = event.target.querySelector('button[type="submit"]')
     button.disabled = true
     button.textContent = "Ajout..."
   }
 
   handleSubmit(event) {
-  const button = event.target.querySelector('button[type="submit"]')
+    const button = event.target.querySelector('button[type="submit"]')
 
-  if (event.detail.success) {
-    button.textContent = "Ajouté !"
-    button.classList.remove("btn-primary")
-    button.classList.add("btn-success")
+    if (event.detail.success) {
+      button.textContent = "Ajouté !"
+      button.classList.remove("btn-primary")
+      button.classList.add("btn-success")
 
-  } else {
-    button.textContent = "Déjà ajouté"
-    button.classList.remove("btn-primary")
-    button.classList.add("btn-warning")
-    button.disabled = false
+    } else {
+      button.textContent = "Déjà ajouté"
+      button.classList.remove("btn-primary")
+      button.classList.add("btn-warning")
+      button.disabled = false
+    }
   }
-}
 
   disconnect() {
     if (this.map) {
